@@ -1,0 +1,94 @@
+$medium: 1113px;
+$small: 630px;
+
+@font-face {
+    font-family: "Bricolage Grotesque";
+    src: url("../public/assets/fonts/BricolageGrotesque-VariableFont.ttf") format('truetype');
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.AppBar {
+
+    a {
+        color: #fff;
+
+        @media screen and (max-width: $medium) {
+            h4 {
+                font-size: 1.5rem;
+            }
+        }
+    }
+
+    .MenuLinks {
+        a {
+            display: inline-flex;
+            align-items: center;
+            min-height: 64px;
+
+        }
+
+        button {
+            min-height: 64px;
+            ;
+        }
+    }
+
+    max-height: 64px;
+}
+
+
+.AppBarSandbox {
+    margin-top: 64px;
+
+    a,
+    .active {
+        color: #fff;
+    }
+
+    @media screen and (max-width: $small) {
+        div {
+            justify-content: center;
+        }
+
+        p {
+            font-size: 0.8rem;
+        }
+    }
+}
+
+.MuiMenu li {
+    color: #000;
+    opacity: 0.87;
+}
+
+.MuiMenuDark {
+    ul {
+        background-color: #585555;
+    }
+
+    li {
+        color: #fff;
+    }
+}
+
+.BusinessDetailsBox {
+    width: 100%;
+    inline-size: 100%;
+    overflow-wrap: break-word;
+}
+
+.BackButton {
+    bottom: 50%;
+}
+
+.error-img {
+    width: 50%;
+
+    @media screen and (max-width: $small) {
+        width: 100%;
+    }
+}
