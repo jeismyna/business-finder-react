@@ -64,7 +64,7 @@ export default function Profile({user}) {
                   <Box className="BusinessDetailsBox" sx={{ mb: 3, textAlign: "center" }}>
                     <Typography variant="h4">{`${userFull.name.first} ${userFull.name.last}`}</Typography>
                   </Box>
-                  <Container sx={{ display: "flex", flexDirection: "column", gap: 1 }}  >
+                  <Container sx={{ display: "flex", flexDirection: "column", gap: 1, overflowWrap: "anywhere" }}  >
                     <Box sx={{ display: "inline-flex", gap: 1 }} >
                       <Typography>{`Full Name: ${userFull.name.first} ${userFull.name.middle} ${userFull.name.last}`}</Typography>
                     </Box>

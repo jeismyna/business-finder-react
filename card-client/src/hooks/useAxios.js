@@ -8,9 +8,7 @@ export default function useAxios() {
 
   useEffect(() => {
     axios.defaults.headers.common["x-auth-token"] = token;
-    console.log("out");
     const requestInterceptor = axios.interceptors.request.use((data) => {
-      console.log("in");
       return Promise.resolve(data);
     }, null);
 

@@ -7,7 +7,6 @@ export function LikeProvider({children}){
     const [likes, setLikes] = useState([]);
 
     useEffect(() => {
-        console.log(likes);
     }, [likes])
 
     return(

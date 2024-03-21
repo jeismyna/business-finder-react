@@ -22,7 +22,7 @@ export default function Cards({ cards, handleDelete, handleUpdateFavsPage }) {
     handleLikeCard(id);
   };
   const handleCall = (id) => {
-    const card = cards.find((card) => card._id == id);
+    const card = cards.find((card) => card._id === id);
     handleCallCard(card);
   }
 

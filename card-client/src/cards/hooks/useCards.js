@@ -99,11 +99,14 @@ export default function useCards() {
     }
   }, []);
 
-  const handleDeleteCard = useCallback(async (cardId) => {
+  const handleDeleteCard = useCallback(async (cardId, rootFlag = true) => {
     try {
       setLoading(true);
       await deleteCard(cardId);
       setLoading(false);
+      if (!rootFlag) {
+        navigate(-1);
+      }
     } catch (error) {
       setLoading(false);
       setError(error);

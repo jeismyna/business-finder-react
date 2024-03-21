@@ -1,19 +1,27 @@
 const express = require("express");
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const db = require("./db");
+const router = require("./routes/router");
+
+/* const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid"); // import uuidv4 function from the uuid package
-const omit = require("just-omit");
+const omit = require("just-omit"); 
 
 const cards = require('./db/cards').cards;
-const users = require('./db/users').users;
+const users = require('./db/users').users;*/
+
 
 const app = express();
 app.use(cors({ origin: "*" }));
-const key = "secret";
+// const key = "secret";
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+app.use("/", router);
 
-const verifyToken = (tokenFromClient) => {
+/* const verifyToken = (tokenFromClient) => {
   try {
     const userDataFromPayload = jwt.verify(tokenFromClient, key);
     return userDataFromPayload;
@@ -177,7 +185,7 @@ app.put("/users", (req, res) => {
   } else {
     res.status(401).send("log in first");
   }
-});
+}); */
 
-const PORT = 8181;
+const PORT = process.env.PORT || 8181;
 app.listen(PORT, () => console.log(`server listening on port ${PORT}`));

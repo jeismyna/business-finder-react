@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import ROUTES from "../../routes/routesModel";
 import PageHeader from "../../components/PageHeader";
 import useCards from "../hooks/useCards";
-import { Container, Box, Grid, Paper, Typography, Avatar, Link } from "@mui/material";
+import { Container, Box, Grid, Paper, Typography, Avatar, Link, IconButton } from "@mui/material";
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -11,7 +12,10 @@ import Fab from '@mui/material/Fab';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import Tooltip from '@mui/material/Tooltip';
 import Zoom from '@mui/material/Zoom';
-
+import DeleteIcon from "@mui/icons-material/Delete";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import { useUser } from "../../users/providers/UserProvider";
+import CardDeleteDialog from "../components/card/CardDeleteDialog";
 
 const Iframe = ({ ...props }) => {
   return (
@@ -25,7 +29,15 @@ export default function CardDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { value: { card }, handleGetCard } = useCards();
+  const { user } = useUser();
+  const [isDialogOpen, setDialog] = useState(false);
+
+  const { value: { card }, handleGetCard, handleDeleteCard } = useCards();
+
+  const handleDelete = () => {
+    handleDeleteCard(id, false); //set rootFlag to false since the delete action was performed from CardDetailsPage
+    setDialog(false);
+  };
 
   useEffect(() => {
     handleGetCard(id);
@@ -59,9 +71,27 @@ export default function CardDetailsPage() {
                     backgroundColor: (theme) => theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.background.paper,
                   }}
                 >
+                  <Box sx={{ mt: -2}}>
+                    {user?.isAdmin || user?.id === card.user_id ? (
+                      <React.Fragment>
+                        <IconButton
+                          aria-label="Delete Card"
+                          onClick={() => setDialog(true)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        <IconButton
+                          aria-label="Edit Card"
+                          onClick={() => navigate(`${ROUTES.EDIT_CARD}/${id}`)}
+                        >
+                          <ModeEditIcon />
+                        </IconButton>
+                      </React.Fragment>
+                    ) : null}
+                  </Box>
                   <Avatar alt={card.image.alt} src={card.image.url}
                     sx={{
-                      width: 220, height: 220, mb: 5, border: 5, borderStyle: "double",
+                      width: 220, height: 220, mb: 5, mt: 1, border: 5, borderStyle: "double",
                       borderColor: (theme) => theme.palette.mode === 'dark' ? theme.palette.action.disabled : theme.palette.action.selected,
                     }} />
                   <Box className="BusinessDetailsBox" sx={{ mb: 3, textAlign: "center" }}>
@@ -69,7 +99,7 @@ export default function CardDetailsPage() {
                     <Typography variant="h5">{card.subtitle}</Typography>
                     <Typography paragraph sx={{ mt: 3 }} >{card.description}</Typography>
                   </Box>
-                  <Container sx={{ display: "flex", flexDirection: "column", gap: 1 }}  >
+                  <Container sx={{ display: "flex", flexDirection: "column", gap: 1, overflowWrap: "anywhere"}}  >
                     <Box sx={{ display: "inline-flex", gap: 1 }} >
                       <LocationCityIcon />
                       <Typography>{`${card.address.street} ${card.address.houseNumber} ${card.address.city} ${card.address.state} ${card.address.country} ${card.address.zip} `}</Typography>
@@ -80,7 +110,7 @@ export default function CardDetailsPage() {
                     </Box>
                     <Box sx={{ display: "inline-flex", gap: 1 }} >
                       <AlternateEmailIcon />
-                      <Link href={"mailto:"+ card.email} color="inherit" underline="hover"><Typography>{card.email}</Typography></Link>
+                      <Link href={"mailto:" + card.email} color="inherit" underline="hover"><Typography>{card.email}</Typography></Link>
                     </Box>
                     <Box sx={{ display: "inline-flex", gap: 1 }} >
                       <LanguageIcon />
@@ -109,8 +139,11 @@ export default function CardDetailsPage() {
             </Grid>
           </Grid>
         </Grid>
-
-
+        <CardDeleteDialog
+          isDialogOpen={isDialogOpen}
+          onChangeDialog={() => setDialog(false)}
+          onDelete={handleDelete}
+        />
       </Container>
     );
   }

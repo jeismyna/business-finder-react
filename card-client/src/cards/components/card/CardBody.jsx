@@ -12,14 +12,26 @@ export default function CardBody({
 }) {
   return (
     <React.Fragment>
-      <CardHeader title={title} subheader={subtitle} />
+      <CardHeader 
+        sx={{
+          display: "flex",
+          overflow: "hidden",
+          "& .MuiCardHeader-content": {
+            overflow: "hidden"
+          }
+        }}      
+      title={title} 
+      titleTypographyProps={{ noWrap: true }}
+      subheader={subtitle}
+      subheaderTypographyProps={{ noWrap: true }}
+      />
       <Divider variant="middle" />
       <CardContent sx={{ minHeight: 110 }}>
         <Typography variant="body2" color="text.secondary">
           <strong>Phone: </strong>
           {phone}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" noWrap>
           <strong>Address: </strong>
           {address.city} {address.street} {address.houseNumber}
         </Typography>

@@ -1,5 +1,5 @@
 import axios from "axios";
-const apiUrl = "http://localhost:8181";
+const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:8181";
 export const getCards = async () => {
   try {
     const response = await axios.get(`${apiUrl}/cards`);
@@ -11,7 +11,6 @@ export const getCards = async () => {
 };
 
 export const getMyCards = async () => {
-  console.log("get my cards");
   try {
     const response = await axios.get(`${apiUrl}/cards/my-cards`);
     const data = response.data;
