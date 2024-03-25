@@ -1,12 +1,12 @@
 import Joi from "joi";
 
 const loginSchema = {
-  email: Joi.string()
+  email: Joi.string().max(350)
     .ruleset.regex(/^([a-zA-Z0-9_\-.]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})$/)
     .rule({ message: "Please enter a valid mail" })
     .required(),
 
-  password: Joi.string()
+  password: Joi.string().max(256)
     .ruleset.regex(
       /((?=.*\d{1})(?=.*[A-Z]{1})(?=.*[a-z]{1})(?=.*[!@#$%^&*-]{1}).{7,20})/
     )

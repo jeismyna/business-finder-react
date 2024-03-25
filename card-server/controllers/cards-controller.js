@@ -16,7 +16,7 @@ getCardsByUserID = async (req, res) => {
     const tokenFromClient = req.header("x-auth-token");
     if (tokenFromClient) {
         const userData = jwt.verifyToken(tokenFromClient);
-        await cards.find({ user_id: userData.id }, { createdAt: 0, updatedAt: 0, __v: 0 }) // Assume user_id is passed as a parameter in the body
+        await cards.find({ user_id: userData.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
             .then(userCards => {
                 res.json(userCards);
             })
@@ -24,7 +24,10 @@ getCardsByUserID = async (req, res) => {
                 res.json(error);
             })
     } else {
-        res.status(404).send("Login first");
+        return res.status(401).json({
+            success: false,
+            error: "Unauthorized"
+        })
     }
 }
 
@@ -39,13 +42,14 @@ getCardByID = async (req, res) => {
         });
 }
 
-createCard = (req, res) => {
+createCard = async (req, res) => {
+
     const body = req.body
 
-    if (!body) {
+    if (Object.keys(body).length === 0) {
         return res.status(400).json({
             success: false,
-            error: "You must provide card details",
+            error: "You must provide card details"
         })
     }
 
@@ -54,48 +58,89 @@ createCard = (req, res) => {
     if (!card) {
         return res.status(400).json({ success: false, error: err })
     }
+    else {
+        const tokenFromClient = req.header("x-auth-token");
+        const userData = jwt.verifyToken(tokenFromClient);
 
-    card
-        .save()
-        .then(() => {
-            console.log("Card created successfully");
-            res.json(card);
-        })
-        .catch(error => {
-            return res.status(400).json({
-                error,
-                message: "Failed creating card",
+        if (userData && ((userData.id === card.user_id && userData.isBusiness) || userData.isAdmin)) {
+            await card
+                .save()
+                .then(() => {
+                    return res.status(201).json({
+                        success: true,
+                        message: "Card created successfully",
+                    })
+                })
+                .catch(error => {
+                    return res.status(400).json({
+                        error,
+                        message: "Failed creating card"
+                    })
+                })
+        }
+        else {
+            return res.status(401).json({
+                success: false,
+                error: "Unauthorized"
             })
-        })
+        }
+    }
 }
 
-updateCard = (req, res) => {
-    const updatedCard = req.body;
-    cards.findOneAndUpdate({ _id: req.params.id }, 
-        { $set: { 
-            title: updatedCard.title, 
-            subtitle: updatedCard.subtitle, 
-            description: updatedCard.description,
-            phone: updatedCard.phone, 
-            email: updatedCard.email, 
-            web: updatedCard.web, 
-            image: updatedCard.image, 
-            address: updatedCard.address
-        }}, { createdAt: 0, updatedAt: 0, __v: 0 })
-    .then(card => {
-        res.json(card);
-    })
-    .catch(error => {
-        return res.status(400).json({
-            error,
-            message: "Failed to update card",
-        })
-    })
+updateCard = async (req, res) => {
+    const tokenFromClient = req.header("x-auth-token");
+    const userData = jwt.verifyToken(tokenFromClient);
+
+    if (userData && (userData.id === req.params.user_id || userData.isAdmin)) {
+        const updatedCard = req.body;
+
+        if (Object.keys(updatedCard).length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: "You must provide card details"
+            })
+        }
+
+        await cards.findOneAndUpdate({ _id: req.params.id }, {
+            $set: {
+                title: updatedCard.title,
+                subtitle: updatedCard.subtitle,
+                description: updatedCard.description,
+                phone: updatedCard.phone,
+                email: updatedCard.email,
+                web: updatedCard.web,
+                image: updatedCard.image,
+                address: updatedCard.address
+            }
+        }, { createdAt: 0, updatedAt: 0, __v: 0, runValidators: true })
+            .then(card => {
+                if (!card) {
+                    return res
+                        .status(404)
+                        .json({ success: false, error: "Card not found" })
+                }
+                else {
+                    return res.status(200).json({
+                        success: true,
+                        message: "Card updated successfully"
+                    })
+                }
+            })
+            .catch(error => {
+                return res.status(400).json({
+                    error: error,
+                    message: "Failed to update card"
+                })
+            })
+    }
+    else {
+        res.status(401).send("Unauthorized");
+    }
 }
 
 updateCardLikes = async (req, res) => {
     await cards.findOne({ _id: req.params.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
-        .then(card => {
+        .then(async card => {
             if (!card) {
                 res.status(404).json({ error: "Card not found" });
             }
@@ -110,32 +155,64 @@ updateCardLikes = async (req, res) => {
                         : [...card.likes, user_id];
 
                     card.likes = updatedLikes;
-                    card.save()
+                    await card.save()
                         .then(() => {
-                            res.json(card);
+                            return res.status(200).json({
+                                success: true,
+                                message: "Favorites updated successfully"
+                            })
                         })
                         .catch(error => {
-                            res.json(error);
+                            return res.status(400).json({
+                                error: error,
+                                message: "Failed to update favorites"
+                            })
                         })
                 }
                 else {
-                    res.status(404).send("Log in first");
+                    return res.status(401).json({
+                        success: false,
+                        error: "Unauthorized"
+                    })
                 }
             }
         })
 }
 
-deleteCard = (req, res) => {
-    cards.findByIdAndDelete(req.params.id, { createdAt: 0, updatedAt: 0, __v: 0 })
-    .then(card => {
-        res.json(card);
-    })
-    .catch(error => {
-        return res.status(400).json({
-            error,
-            message: "Failed to delete card",
+deleteCard = async (req, res) => {
+    await cards.findOne({ _id: req.params.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
+        .then(async card => {
+            if (!card) {
+                res.status(404).json({ error: "Card not found" });
+            }
+            else {
+                const tokenFromClient = req.header("x-auth-token");
+                const userData = jwt.verifyToken(tokenFromClient);
+
+                if (userData && (userData.id === card.user_id || userData.isAdmin)) {
+
+                    await card.deleteOne({ _id: req.params.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
+                        .then(() => {
+                            return res.status(200).json({
+                                success: true,
+                                message: "Card deleted successfully"
+                            })
+                        })
+                        .catch(error => {
+                            return res.status(400).json({
+                                error: error,
+                                message: "Failed to delete card"
+                            })
+                        })
+                }
+                else {
+                    return res.status(401).json({
+                        success: false,
+                        error: "Unauthorized"
+                    })
+                }
+            }
         })
-    })
 }
 
 module.exports = {

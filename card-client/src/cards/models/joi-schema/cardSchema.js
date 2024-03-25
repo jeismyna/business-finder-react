@@ -25,7 +25,7 @@ const cardSchema = {
     .rule({ message: 'card "image url" must be a valid url' })
     .allow(""),
   imageAlt: Joi.string().min(2).max(50).allow(""),
-  state: Joi.string().max(50).allow(""),
+  state: Joi.string().min(2).max(50).allow(""),
   country: Joi.string().min(2).max(200).required(),
   city: Joi.string().min(2).max(200).required(),
   street: Joi.string().min(2).max(150).required(),

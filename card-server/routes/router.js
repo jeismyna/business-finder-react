@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/users/login", UsersController.loginUser);
 router.get("/users/:id", UsersController.getUserByID);
 router.post("/users", UsersController.createUser);
-router.put("/users", UsersController.updateUser);
+router.put("/users/:id", UsersController.updateUser);
 
 router.get("/cards", CardsController.getCards);
 router.get("/cards/my-cards", CardsController.getCardsByUserID);

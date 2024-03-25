@@ -14,7 +14,7 @@ loginUser = async (req, res) => {
     }
     // User is not logged in, so check if the email and password are valid
     const { email, password } = req.body;
-    await users.findOne({ email: email, password: password }, { password: 0, createdAt: 0, updatedAt: 0 })
+    await users.findOne({ email: email, password: password }, { password: 0, createdAt: 0, updatedAt: 0, __v: 0 })
         .then(user => {
             if (!user) {
                 // User not found or password incorrect
@@ -36,7 +36,7 @@ loginUser = async (req, res) => {
 }
 
 getUserByID = async (req, res) => {
-    await users.findOne({ _id: req.params.id }, { password: 0, createdAt: 0, updatedAt: 0 })
+    await users.findOne({ _id: req.params.id }, { password: 0, createdAt: 0, updatedAt: 0, __v: 0 })
         .then(user => {
             if (!user) {
                 res.status(404).json({ error: "User not found" });
@@ -46,10 +46,10 @@ getUserByID = async (req, res) => {
         });
 }
 
-createUser = (req, res) => {
+createUser = async (req, res) => {
     const body = req.body
 
-    if (!body) {
+    if (Object.keys(body).length === 0) {
         return res.status(400).json({
             success: false,
             error: "You must provide user details",
@@ -62,12 +62,11 @@ createUser = (req, res) => {
         return res.status(400).json({ success: false, error: err })
     }
 
-    user
+    await user
         .save()
         .then(() => {
             return res.status(201).json({
                 success: true,
-                id: user._id,
                 message: "User created successfully",
             })
         })
@@ -79,23 +78,50 @@ createUser = (req, res) => {
         })
 }
 
-updateUser = (req, res) => {
+updateUser = async (req, res) => {
     const tokenFromClient = req.header("x-auth-token");
     const userData = jwt.verifyToken(tokenFromClient);
 
-    if (userData) {
+    if (userData && (userData.id === req.params.id || userData.isAdmin)) {
         const updatedUser = req.body;
-        users.findOneAndReplace({ _id: { $eq: userData.id } }, updatedUser, null, (err, user) => {
-            if (err) {
-                console.log(err);
-                res.send(404).send("User not found");
+
+        if (Object.keys(updatedUser).length === 0) {
+            return res.status(400).json({
+                success: false,
+                error: "You must provide user details",
+            })
+        }
+
+        await users.findOneAndUpdate({ _id: req.params.id }, {
+            $set: {
+                name: updatedUser.name,
+                phone: updatedUser.phone,
+                email: updatedUser.email,
+                address: updatedUser.address,
+                image: updatedUser.image
             }
-            else {
-                res.status(201).send({ message: "User updated successfully." });
-            }
-        })
+        }, { password: 0, createdAt: 0, updatedAt: 0, __v: 0, runValidators: true })
+            .then(user => {
+                if (!user) {
+                    return res
+                        .status(404)
+                        .json({ success: false, error: "User not found" })
+                }
+                else {
+                    return res.status(200).json({
+                        success: true,
+                        message: "User updated successfully"
+                    })
+                }
+            })
+            .catch(error => {
+                return res.status(400).json({
+                    error: error,
+                    message: "Failed to update user",
+                })
+            })
     } else {
-        res.status(401).send("Log in first");
+        res.status(401).send("Unauthorized");
     }
 }
 
