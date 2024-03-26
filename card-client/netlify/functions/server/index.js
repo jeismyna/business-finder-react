@@ -1,10 +1,12 @@
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
+const serverless = require("serverless-http");
+
 const db = require("./db");
 const router = require("./routes/router");
 
 const app = express();
+
 app.use(cors({ origin: "*" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -12,10 +14,9 @@ app.use(express.json());
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 app.get("/", (req, res) => {
-    res.send("Business Finder")
+  res.send("Business Finder")
 });
 
 app.use("/api", router);
 
-const PORT = process.env.PORT || 8181;
-app.listen(PORT, () => console.log(`server listening on port ${PORT}`));
+export const handler = serverless(app);
