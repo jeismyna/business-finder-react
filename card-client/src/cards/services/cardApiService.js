@@ -1,12 +1,10 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "http://localhost:8181/api",
-})
+const apiUrl = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "http://localhost:8181/api";
 
 export const getCards = async () => {
   try {
-    const response = await api.get(`/cards`);
+    const response = await axios.get(`${apiUrl}/cards`);
     const data = response.data;
     return data;
   } catch (error) {
@@ -16,7 +14,7 @@ export const getCards = async () => {
 
 export const getMyCards = async () => {
   try {
-    const response = await api.get(`/cards/my-cards`);
+    const response = await axios.get(`${apiUrl}/cards/my-cards`);
     const data = response.data;
     return data;
   } catch (error) {
@@ -26,7 +24,7 @@ export const getMyCards = async () => {
 
 export const deleteCard = async (cardId) => {
   try {
-    const { data } = await api.delete(`/cards/${cardId}`);
+    const { data } = await axios.delete(`${apiUrl}/cards/${cardId}`);
     return data;
   } catch (error) {
     return Promise.reject(error.message);
@@ -35,7 +33,7 @@ export const deleteCard = async (cardId) => {
 
 export const getCard = async (cardId) => {
   try {
-    const { data } = await api.get(`/cards/${cardId}`);
+    const { data } = await axios.get(`${apiUrl}/cards/${cardId}`);
     return data;
   } catch (error) {
     return Promise.reject(error.message);
@@ -44,7 +42,7 @@ export const getCard = async (cardId) => {
 
 export const createCard = async (card) => {
   try {
-    const { data } = await api.post(`/cards/`, card);
+    const { data } = await axios.post(`${apiUrl}/cards/`, card);
     return data;
   } catch (error) {
     return Promise.reject(error.message);
@@ -53,8 +51,8 @@ export const createCard = async (card) => {
 
 export const editCard = async (cardId, normalaizedCard) => {
   try {
-    const { data } = await api.put(
-      `/cards/${cardId}`,
+    const { data } = await axios.put(
+      `${apiUrl}/cards/${cardId}`,
       normalaizedCard
     );
     return data;
@@ -65,7 +63,7 @@ export const editCard = async (cardId, normalaizedCard) => {
 
 export const changeLikeStatus = async (cardId) => {
   try {
-    const { data } = await api.patch(`/cards/${cardId}`);
+    const { data } = await axios.patch(`${apiUrl}/cards/${cardId}`);
     return data;
   } catch (error) {
     return Promise.reject(error.message);
