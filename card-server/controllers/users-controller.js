@@ -27,15 +27,20 @@ loginUser = async (req, res) => {
                     isAdmin: user.isAdmin,
                     isBusiness: user.isBusiness,
                     firstName: user.name.first,
-                    id: user._id,
+                    id: user._id
                 };
                 const token = jwt.getToken(userDataForToken);
+
                 res.send(token);
             }
         });
 }
 
 getUserByID = async (req, res) => {
+    const tokenFromClient = req.header("x-auth-token");
+    const userData = jwt.verifyToken(tokenFromClient);
+
+    if (userData && (userData.id === req.params.id || userData.isAdmin)) {
     await users.findOne({ _id: req.params.id }, { password: 0, createdAt: 0, updatedAt: 0, __v: 0 })
         .then(user => {
             if (!user) {
@@ -44,6 +49,10 @@ getUserByID = async (req, res) => {
                 res.json(user);
             }
         });
+    }
+    else {
+        res.status(401).send("Unauthorized");
+    }
 }
 
 createUser = async (req, res) => {
@@ -120,7 +129,8 @@ updateUser = async (req, res) => {
                     message: "Failed to update user",
                 })
             })
-    } else {
+    }
+    else {
         res.status(401).send("Unauthorized");
     }
 }
