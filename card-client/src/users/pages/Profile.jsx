@@ -40,7 +40,7 @@ export default function Profile({user}) {
             <ArrowBackIosNewIcon sx={{ marginRight: "5px" }} />
           </Fab>
         </Tooltip>
-        <Grid sx={{ flexGrow: 1, p: 3 }} container spacing={2}>
+        <Grid sx={{ flexGrow: 1, p: 3 }} container justifyContent="center" spacing={2}>
           <Grid item md={12}>
             <Grid container justifyContent="center" spacing={5}>
               <Grid key={1} item>
@@ -50,8 +50,8 @@ export default function Profile({user}) {
                     height: "auto",
                     minHeight: 550,
                     width: "auto",
-                    minWidth: { xs: 400, sm: 400, md: 500, lg: 400 },
-                    maxWidth: { xs: 400, sm: 400, md: 500, lg: 400 },
+                    minWidth: { xs: 400, sm: 400, md: 500, lg: 500 },
+                    maxWidth: { xs: 400, sm: 400, md: 500, lg: 500 },
                     display: "flex", flexDirection: "column", alignItems: "center",
                     backgroundColor: (theme) => theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.background.paper,
                   }}
