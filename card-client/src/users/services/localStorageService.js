@@ -6,8 +6,10 @@ export const setTokenInLocalStorage = (encryptedToken) =>
 
 export const getUser = () => {
   try {
-    const user = localStorage.getItem(TOKEN);
-    return JwtDecode(user);
+    const user = JwtDecode(getToken());
+    if (user.exp > Date.now() / 1000) {
+      return user;
+    }
   } catch (error) {
     return null;
   }
@@ -16,3 +18,4 @@ export const getUser = () => {
 export const removeToken = () => localStorage.removeItem(TOKEN);
 
 export const getToken = () => localStorage.getItem(TOKEN);
+

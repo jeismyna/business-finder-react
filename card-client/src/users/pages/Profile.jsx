@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import useUsers from "../hooks/useUsers"
-import { useNavigate } from "react-router-dom";
-import ROUTES from "../../routes/routesModel";
+import { useParams, useNavigate } from "react-router-dom";
 import Error from "../../components/Error";
 import Spinner from "../../components/Spinner";
 import PageHeader from "../../components/PageHeader";
@@ -11,20 +10,17 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import Tooltip from '@mui/material/Tooltip';
 import Zoom from '@mui/material/Zoom';
 
-export default function Profile({user}) {
+export default function Profile() {
 
   const { value, valueResolvedUser, handleGetUser } = useUsers();
   const { isLoading, error } = value;
   const { userFull } = valueResolvedUser;
+  const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
-      navigate(ROUTES.LOGIN);
-    } else {
-      handleGetUser(user.id);
-    }
-  }, [user.id]);
+      handleGetUser(id);
+  }, [id]);
 
   if (isLoading) return <Spinner />;
   if (error) return <Error errorMessage={error.toString()} />;

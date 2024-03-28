@@ -31,7 +31,7 @@ const useUsers = () => {
   );
 
   //this is in order to differentiate between token data which should only contain basic details and full user details which are relevant for this page only and we don't want to carry it to other pages.
-  const requestStatusGetUserFull = useCallback( 
+  const requestStatusGetUserFull = useCallback(
     (loading, errorMessage, userFull = null) => {
       setLoading(loading);
       setUserFull(userFull);
@@ -52,6 +52,13 @@ const useUsers = () => {
       requestStatus(false, error, null);
     }
   }, []);
+
+  const handleCheckToken = useCallback(() => {
+    if (!getUser()) {
+      handleLogout();
+      navigate(ROUTES.CARDS);
+    }
+  }, [setUser]);
 
   const handleLogout = useCallback(() => {
     removeToken();
@@ -75,19 +82,20 @@ const useUsers = () => {
     [requestStatus, handleLogin]
   );
 
-    //handleGetUser
-    const handleGetUser = useCallback(async (userId) => {
-      try {
-        setLoading(true);
-        const user = await getUserData(userId);
-        //requestStatus(false, null, user);
-        requestStatusGetUserFull(false, null, user);
-        return user;
-      } catch (error) {
-        //requestStatus(false, error, null);
-        requestStatusGetUserFull(false, error, null);
-      }
-    }, []);
+  //handleGetUser
+  const handleGetUser = useCallback(async (userId) => {
+    try {
+      setLoading(true);
+      handleCheckToken();
+      const user = await getUserData(userId);
+      //requestStatus(false, null, user);
+      requestStatusGetUserFull(false, null, user);
+      return user;
+    } catch (error) {
+      //requestStatus(false, error, null);
+      requestStatusGetUserFull(false, error, null);
+    }
+  }, []);
 
   const value = useMemo(
     () => ({ isLoading, error, user }),
@@ -103,6 +111,7 @@ const useUsers = () => {
     value,
     valueResolvedUser,
     handleLogin,
+    handleCheckToken,
     handleLogout,
     handleSignup,
     handleGetUser,

@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import useAxios from "../../hooks/useAxios";
 import { useSnack } from "../../providers/SnackbarProvider";
 import { useUser } from "../../users/providers/UserProvider";
+import useUsers from "../../users/hooks/useUsers";
 import {
   changeLikeStatus,
   createCard,
@@ -10,11 +11,13 @@ import {
   getCard,
   getCards,
   getMyCards,
+  getFavCards
 } from "../services/cardApiService";
 import { useNavigate } from "react-router-dom";
 
 export default function useCards() {
 
+  const { handleCheckToken } = useUsers();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [card, setCard] = useState(null);
@@ -39,6 +42,7 @@ export default function useCards() {
   const handleGetCards = useCallback(async () => {
     try {
       setLoading(true);
+      handleCheckToken();
       const cards = await getCards();
       await timeout(400); //in Milliseconds
       requestStatus(false, null, cards);
@@ -51,9 +55,11 @@ export default function useCards() {
 
   const handleGetMyCards = useCallback(async () => {
     try {
-      setLoading(true);
-      const cards = await getMyCards();
-      requestStatus(false, null, cards);
+        setLoading(true);
+        handleCheckToken();
+        const cards = await getMyCards();
+        requestStatus(false, null, cards);
+
     } catch (error) {
       requestStatus(false, error, null);
     }
@@ -63,6 +69,7 @@ export default function useCards() {
   const handleGetCard = useCallback(async (cardId) => {
     try {
       setLoading(true);
+      handleCheckToken();
       const card = await getCard(cardId);
       requestStatus(false, null, null, card);
       return card;
@@ -75,6 +82,8 @@ export default function useCards() {
   const handleCreateCard = useCallback(async (cardFromClient) => {
     try {
       setLoading(true);
+      handleCheckToken();
+      await timeout(200);
       const card = await createCard(cardFromClient);
       requestStatus(false, null, null, card);
       snack("success", "A new business card has been created");
@@ -89,6 +98,8 @@ export default function useCards() {
   const handleUpdateCard = useCallback(async (cardId, cardFromClient) => {
     try {
       setLoading(true);
+      handleCheckToken();
+      await timeout(200);
       const card = await editCard(cardId, cardFromClient);
       requestStatus(false, null, null, card);
       snack("success", "The business card has been successfully updated");
@@ -102,6 +113,8 @@ export default function useCards() {
   const handleDeleteCard = useCallback(async (cardId, rootFlag = true) => {
     try {
       setLoading(true);
+      handleCheckToken();
+      await timeout(200);
       await deleteCard(cardId);
       setLoading(false);
       if (!rootFlag) {
@@ -125,6 +138,8 @@ export default function useCards() {
   //handleLikeCard
   const handleLikeCard = useCallback(async (cardId) => {
     try {
+      handleCheckToken();
+      await timeout(200);
       const card = await changeLikeStatus(cardId);
       requestStatus(false, null, cards, card);
       card.likes.includes(user.id) ? addToLikes(card) : removeFromLikes(card);
@@ -134,13 +149,13 @@ export default function useCards() {
   }, []);
 
   //handleGetFavCards
-  const handleGetFavCards = useCallback(async (userID) => {
+  const handleGetFavCards = useCallback(async () => {
     try {
-      setLoading(true);
-      await timeout(200);
-      const cards = await getCards();
-      const favCards = cards.filter((card) => card.likes.includes(userID));
-      requestStatus(false, null, favCards);
+        setLoading(true);
+        handleCheckToken();
+        await timeout(200);
+        const cards = await getFavCards();
+        requestStatus(false, null, cards);
     } catch (error) {
       requestStatus(false, error, null);
     }

@@ -1,25 +1,16 @@
 import { Container } from "@mui/material";
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
-import ROUTES from "../../routes/routesModel";
-import { useUser } from "../../users/providers/UserProvider";
 import CardsFeedback from "../components/CardsFeedback";
 import useCards from "../hooks/useCards";
 
-export default function MyCards({user}) {
+export default function MyCards() {
   const { value, handleGetMyCards, handleDeleteCard } = useCards();
   const { cards, error, isLoading } = value;
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    if (!user) {
-      navigate(ROUTES.CARDS);
-    } else {
       handleGetMyCards();
-    }
-  }, [user]);
+  }, []);
 
   const handleDelete = async (id) => {
     await handleDeleteCard(id);

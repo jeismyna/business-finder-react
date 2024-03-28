@@ -7,7 +7,6 @@ export const login = async (user) => {
     const { data } = await axios.post(`${apiUrl}/users/login`, user);
     return data;
   } catch (error) {
-    console.log(error);
     return Promise.reject(error.message);
   }
 };

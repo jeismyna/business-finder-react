@@ -11,6 +11,7 @@ router.post("/users", UsersController.createUser);
 router.put("/users/:id", UsersController.updateUser);
 
 router.get("/cards", CardsController.getCards);
+router.get("/cards/fav-cards", CardsController.getFavoriteCards);
 router.get("/cards/my-cards", CardsController.getCardsByUserID);
 router.get("/cards/:id", CardsController.getCardByID);
 router.post("/cards", CardsController.createCard);

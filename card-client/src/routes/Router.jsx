@@ -26,7 +26,6 @@ import MapPage from "../sandbox/map/MapPage";
 import { useUser } from "../users/providers/UserProvider";
 
 export default function Router() {
-  const { user } = useUser();
   return (
     <Routes>
       <Route path={ROUTES.ROOT} element={<CardPage />} />
@@ -34,9 +33,9 @@ export default function Router() {
       <Route path={ROUTES.ABOUT} element={<AboutPage />} />
       <Route path={ROUTES.LOGIN} element={<LoginPage />} />
       <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
-      <Route path={ROUTES.FAV_CARDS} element={<FavCards user={user} />} />
-      <Route path={ROUTES.MY_CARDS} element={<MyCards user={user} />} />
-      <Route path={ROUTES.USER_PROFILE} element={<Profile user={user} />} />
+      <Route path={ROUTES.FAV_CARDS} element={<FavCards />} />
+      <Route path={ROUTES.MY_CARDS} element={<MyCards />} />
+      <Route path={`${ROUTES.USER_PROFILE}/:id`} element={<Profile />} />
       <Route path={ROUTES.EDIT_USER} element={<EditAccountPage />} />
       <Route path={ROUTES.CREATE_CARD} element={<CreateCardPage />} />
       <Route path={`${ROUTES.EDIT_CARD}/:id`} element={<EditCardPage />} />

@@ -12,10 +12,32 @@ getCards = async (req, res) => {
         });
 }
 
+getFavoriteCards = async (req, res) => {
+    const tokenFromClient = req.header("x-auth-token");
+    const userData = jwt.verifyToken(tokenFromClient);
+
+    if (userData) {
+        await cards.find({ likes: userData.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
+            .then(favCards => {
+                if (!favCards) {
+                    res.status(404).json({ error: "No cards were found" });
+                } else {
+                    res.json(favCards);
+                }
+            })
+    } else {
+        return res.status(401).json({
+            success: false,
+            error: "Unauthorized"
+        })
+    }
+}
+
 getCardsByUserID = async (req, res) => {
     const tokenFromClient = req.header("x-auth-token");
-    if (tokenFromClient) {
-        const userData = jwt.verifyToken(tokenFromClient);
+    const userData = jwt.verifyToken(tokenFromClient);
+
+    if (userData) {
         await cards.find({ user_id: userData.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
             .then(userCards => {
                 res.json(userCards);
@@ -91,7 +113,7 @@ updateCard = async (req, res) => {
     const tokenFromClient = req.header("x-auth-token");
     const userData = jwt.verifyToken(tokenFromClient);
 
-    if (userData && (userData.id === req.params.user_id || userData.isAdmin)) {
+    if (userData) {
         const updatedCard = req.body;
 
         if (Object.keys(updatedCard).length === 0) {
@@ -101,7 +123,9 @@ updateCard = async (req, res) => {
             })
         }
 
-        await cards.findOneAndUpdate({ _id: req.params.id }, {
+        const filter = userData.isAdmin ? { _id: req.params.id } : { _id: req.params.id, user_id: userData.id };
+
+        await cards.findOneAndUpdate(filter, {
             $set: {
                 title: updatedCard.title,
                 subtitle: updatedCard.subtitle,
@@ -146,8 +170,9 @@ updateCardLikes = async (req, res) => {
             }
             else {
                 const tokenFromClient = req.header("x-auth-token");
-                if (tokenFromClient) {
-                    const userData = jwt.verifyToken(tokenFromClient);
+                const userData = jwt.verifyToken(tokenFromClient);
+
+                if (userData) {
                     const user_id = userData.id;
                     const userLiked = card.likes.includes(user_id);
                     const updatedLikes = userLiked
@@ -180,43 +205,43 @@ updateCardLikes = async (req, res) => {
 }
 
 deleteCard = async (req, res) => {
-    await cards.findOne({ _id: req.params.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
-        .then(async card => {
-            if (!card) {
-                res.status(404).json({ error: "Card not found" });
-            }
-            else {
-                const tokenFromClient = req.header("x-auth-token");
-                const userData = jwt.verifyToken(tokenFromClient);
 
-                if (userData && (userData.id === card.user_id || userData.isAdmin)) {
+    const tokenFromClient = req.header("x-auth-token");
+    const userData = jwt.verifyToken(tokenFromClient);
 
-                    await card.deleteOne({ _id: req.params.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
-                        .then(() => {
-                            return res.status(200).json({
-                                success: true,
-                                message: "Card deleted successfully"
-                            })
-                        })
-                        .catch(error => {
-                            return res.status(400).json({
-                                error: error,
-                                message: "Failed to delete card"
-                            })
-                        })
+    if (userData) {
+        
+        const filter = userData.isAdmin ? { _id: req.params.id } : { _id: req.params.id, user_id: userData.id };
+
+        await cards.findOneAndDelete(filter, { createdAt: 0, updatedAt: 0, __v: 0 })
+            .then(card => {
+                if (!card) {
+                    return res
+                        .status(404)
+                        .json({ success: false, error: "Card not found" })
                 }
                 else {
-                    return res.status(401).json({
-                        success: false,
-                        error: "Unauthorized"
+                    return res.status(200).json({
+                        success: true,
+                        message: "Card deleted successfully"
                     })
                 }
-            }
-        })
+            })
+            .catch(error => {
+                return res.status(400).json({
+                    error: error,
+                    message: "Failed to delete card"
+                })
+            })
+    }
+    else {
+        res.status(401).send("Unauthorized");
+    }
 }
 
 module.exports = {
     getCards,
+    getFavoriteCards,
     getCardsByUserID,
     getCardByID,
     createCard,
