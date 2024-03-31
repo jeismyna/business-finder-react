@@ -16,6 +16,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import { useUser } from "../../users/providers/UserProvider";
 import CardDeleteDialog from "../components/card/CardDeleteDialog";
+import Error from "../../components/Error";
+import Spinner from "../../components/Spinner";
 
 const Iframe = ({ ...props }) => {
   return (
@@ -26,13 +28,15 @@ const Iframe = ({ ...props }) => {
 }
 
 export default function CardDetailsPage() {
+
   const { id } = useParams();
   const navigate = useNavigate();
 
   const { user } = useUser();
   const [isDialogOpen, setDialog] = useState(false);
 
-  const { value: { card }, handleGetCard, handleDeleteCard } = useCards();
+  const { value, handleGetCard, handleDeleteCard } = useCards();
+  const { isLoading, error, card } = value;
 
   const handleDelete = () => {
     handleDeleteCard(id, false); //set rootFlag to false since the delete action was performed from CardDetailsPage
@@ -43,6 +47,8 @@ export default function CardDetailsPage() {
     handleGetCard(id);
   }, [handleGetCard, id]);
 
+  if (isLoading) return <Spinner />;
+  if (error) return <Error errorMessage={error.toString()} />;
   if (card) {
     return (
       <Container>

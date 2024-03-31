@@ -24,7 +24,7 @@ const UserForm = ({
       onChange={onFormChange}
       styles={{ maxWidth: "800px" }}
       title={title}
-      to={ROUTES.CARDS}
+      to={ROUTES.ROOT}
     >
       <Input
         name="first"

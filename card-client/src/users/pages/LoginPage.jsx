@@ -21,7 +21,7 @@ export default function LoginPage() {
     loginSchema,
     handleLogin
   );
-  if (user) return <Navigate replace to={ROUTES.CARDS} />;
+  if (user) return <Navigate replace to={ROUTES.ROOT} />;
 
   return (
     <Container>
@@ -38,7 +38,7 @@ export default function LoginPage() {
       >
         <Form
           styles={{ maxWidth: "450px" }}
-          to={ROUTES.CARDS}
+          to={ROUTES.ROOT}
           onSubmit={rest.onSubmit}
           onReset={rest.handleReset}
           onChange={rest.validateForm}

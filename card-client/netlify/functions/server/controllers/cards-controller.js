@@ -5,7 +5,9 @@ getCards = async (req, res) => {
     await cards.find({}, { createdAt: 0, updatedAt: 0, __v: 0 })
         .then(allCards => {
             if (!allCards) {
-                res.status(404).json({ error: "No cards were found" });
+                res.status(404).json({ 
+                    success: false,
+                    message: "No cards were found" });
             } else {
                 res.json(allCards);
             }
@@ -20,7 +22,9 @@ getFavoriteCards = async (req, res) => {
         await cards.find({ likes: userData.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
             .then(favCards => {
                 if (!favCards) {
-                    res.status(404).json({ error: "No cards were found" });
+                    res.status(404).json({ 
+                        success: false,
+                        message: "No cards were found" });
                 } else {
                     res.json(favCards);
                 }
@@ -28,7 +32,7 @@ getFavoriteCards = async (req, res) => {
     } else {
         return res.status(401).json({
             success: false,
-            error: "Unauthorized"
+            message: "Unauthorized"
         })
     }
 }
@@ -43,12 +47,15 @@ getCardsByUserID = async (req, res) => {
                 res.json(userCards);
             })
             .catch(error => {
-                res.json(error);
+                res.status(404).json({ 
+                    success: false,
+                    error: error,
+                    message: "No cards were found" });
             })
     } else {
         return res.status(401).json({
             success: false,
-            error: "Unauthorized"
+            message: "Unauthorized"
         })
     }
 }
@@ -57,7 +64,9 @@ getCardByID = async (req, res) => {
     await cards.findOne({ _id: req.params.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
         .then(card => {
             if (!card) {
-                res.status(404).json({ error: "Card not found" });
+                res.status(404).json({ 
+                    success: false,
+                    message: "Card not found" });
             } else {
                 res.json(card);
             }
@@ -71,14 +80,14 @@ createCard = async (req, res) => {
     if (Object.keys(body).length === 0) {
         return res.status(400).json({
             success: false,
-            error: "You must provide card details"
+            message: "You must provide card details"
         })
     }
 
     const card = new cards(body)
 
     if (!card) {
-        return res.status(400).json({ success: false, error: err })
+        return res.status(400).json({ success: false, message: "Bad request format" })
     }
     else {
         const tokenFromClient = req.header("x-auth-token");
@@ -95,7 +104,8 @@ createCard = async (req, res) => {
                 })
                 .catch(error => {
                     return res.status(400).json({
-                        error,
+                        success: false,
+                        error: error,
                         message: "Failed creating card"
                     })
                 })
@@ -103,7 +113,7 @@ createCard = async (req, res) => {
         else {
             return res.status(401).json({
                 success: false,
-                error: "Unauthorized"
+                message: "Unauthorized"
             })
         }
     }
@@ -119,7 +129,7 @@ updateCard = async (req, res) => {
         if (Object.keys(updatedCard).length === 0) {
             return res.status(400).json({
                 success: false,
-                error: "You must provide card details"
+                message: "You must provide card details"
             })
         }
 
@@ -141,7 +151,7 @@ updateCard = async (req, res) => {
                 if (!card) {
                     return res
                         .status(404)
-                        .json({ success: false, error: "Card not found" })
+                        .json({ success: false, message: "Card not found" })
                 }
                 else {
                     return res.status(200).json({
@@ -158,7 +168,10 @@ updateCard = async (req, res) => {
             })
     }
     else {
-        res.status(401).send("Unauthorized");
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        })
     }
 }
 
@@ -166,7 +179,7 @@ updateCardLikes = async (req, res) => {
     await cards.findOne({ _id: req.params.id }, { createdAt: 0, updatedAt: 0, __v: 0 })
         .then(async card => {
             if (!card) {
-                res.status(404).json({ error: "Card not found" });
+                res.status(404).json({ success: false, message: "Card not found" });
             }
             else {
                 const tokenFromClient = req.header("x-auth-token");
@@ -197,7 +210,7 @@ updateCardLikes = async (req, res) => {
                 else {
                     return res.status(401).json({
                         success: false,
-                        error: "Unauthorized"
+                        message: "Unauthorized"
                     })
                 }
             }
@@ -218,7 +231,7 @@ deleteCard = async (req, res) => {
                 if (!card) {
                     return res
                         .status(404)
-                        .json({ success: false, error: "Card not found" })
+                        .json({ success: false, message: "Card not found" })
                 }
                 else {
                     return res.status(200).json({
@@ -229,13 +242,17 @@ deleteCard = async (req, res) => {
             })
             .catch(error => {
                 return res.status(400).json({
+                    success: false,
                     error: error,
                     message: "Failed to delete card"
                 })
             })
     }
     else {
-        res.status(401).send("Unauthorized");
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        })
     }
 }
 

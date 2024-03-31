@@ -14,7 +14,7 @@ loginUser = async (req, res) => {
         .then(user => {
             if (!user) {
                 // User not found or password incorrect
-                res.status(401).json({ message: "Invalid email or password" });
+                res.status(401).json({ success: false, message: "Invalid email or password" });
                 return;
             } else {
                 if (userData) {
@@ -47,14 +47,17 @@ getUserByID = async (req, res) => {
         await users.findOne({ _id: req.params.id }, { password: 0, createdAt: 0, updatedAt: 0, __v: 0 })
             .then(user => {
                 if (!user) {
-                    res.status(404).json({ error: "User not found" });
+                    res.status(404).json({ success: false, message: "User not found" });
                 } else {
                     res.json(user);
                 }
             });
     }
     else {
-        res.status(401).send("Unauthorized");
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        })
     }
 }
 
@@ -64,14 +67,14 @@ createUser = async (req, res) => {
     if (Object.keys(body).length === 0) {
         return res.status(400).json({
             success: false,
-            error: "You must provide user details",
+            message: "You must provide user details",
         })
     }
 
     const user = new users(body)
 
     if (!user) {
-        return res.status(400).json({ success: false, error: err })
+        return res.status(400).json({ success: false, message: "Bad request format" })
     }
 
     await user
@@ -84,7 +87,7 @@ createUser = async (req, res) => {
         })
         .catch(error => {
             return res.status(400).json({
-                error,
+                error: error,
                 message: "Failed creating user",
             })
         })
@@ -100,7 +103,7 @@ updateUser = async (req, res) => {
         if (Object.keys(updatedUser).length === 0) {
             return res.status(400).json({
                 success: false,
-                error: "You must provide user details",
+                message: "You must provide user details",
             })
         }
 
@@ -117,7 +120,7 @@ updateUser = async (req, res) => {
                 if (!user) {
                     return res
                         .status(404)
-                        .json({ success: false, error: "User not found" })
+                        .json({ success: false, message: "User not found" })
                 }
                 else {
                     return res.status(200).json({
@@ -134,7 +137,10 @@ updateUser = async (req, res) => {
             })
     }
     else {
-        res.status(401).send("Unauthorized");
+        return res.status(401).json({
+            success: false,
+            message: "Unauthorized"
+        })
     }
 }
 

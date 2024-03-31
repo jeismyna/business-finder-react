@@ -7,7 +7,7 @@ export const login = async (user) => {
     const { data } = await axios.post(`${apiUrl}/users/login`, user);
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -16,7 +16,7 @@ export const signup = async (normalizedUser) => {
     const { data } = await axios.post(`${apiUrl}/users`, normalizedUser);
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -25,6 +25,6 @@ export const getUserData = async (userId) => {
     const { data } = await axios.get(`${apiUrl}/users/${userId}`);
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };

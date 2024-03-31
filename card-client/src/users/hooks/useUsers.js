@@ -47,7 +47,7 @@ const useUsers = () => {
       setToken(token);
       const userFromLocalStorage = getUser();
       requestStatus(false, null, userFromLocalStorage);
-      navigate(ROUTES.CARDS);
+      navigate(ROUTES.ROOT);
     } catch (error) {
       requestStatus(false, error, null);
     }
@@ -56,7 +56,7 @@ const useUsers = () => {
   const handleCheckToken = useCallback(() => {
     if (!getUser()) {
       handleLogout();
-      navigate(ROUTES.CARDS);
+      navigate(ROUTES.ROOT);
     }
   }, [setUser]);
 
@@ -88,11 +88,9 @@ const useUsers = () => {
       setLoading(true);
       handleCheckToken();
       const user = await getUserData(userId);
-      //requestStatus(false, null, user);
       requestStatusGetUserFull(false, null, user);
       return user;
     } catch (error) {
-      //requestStatus(false, error, null);
       requestStatusGetUserFull(false, error, null);
     }
   }, []);

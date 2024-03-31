@@ -26,10 +26,10 @@ import MapPage from "../sandbox/map/MapPage";
 import { useUser } from "../users/providers/UserProvider";
 
 export default function Router() {
+    const { user } = useUser();
   return (
     <Routes>
       <Route path={ROUTES.ROOT} element={<CardPage />} />
-      <Route path={ROUTES.CARDS} element={<CardPage />} />
       <Route path={ROUTES.ABOUT} element={<AboutPage />} />
       <Route path={ROUTES.LOGIN} element={<LoginPage />} />
       <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
@@ -40,7 +40,7 @@ export default function Router() {
       <Route path={ROUTES.CREATE_CARD} element={<CreateCardPage />} />
       <Route path={`${ROUTES.EDIT_CARD}/:id`} element={<EditCardPage />} />
       <Route path={`${ROUTES.CARD_INFO}/:id`} element={<CardDetailsPage />} />
-      <Route path={ROUTES.SANDBOX} element={<SandBox />}>
+      <Route path={ROUTES.SANDBOX} element={user && user.isAdmin ? <SandBox /> : <ErrorPage />}>
         <Route path="counter" element={<Counter />} />
         <Route path="mydetails" element={<MyDetails />} />
         <Route path="password" element={<Password />} />

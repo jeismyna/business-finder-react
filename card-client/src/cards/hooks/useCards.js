@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import useAxios from "../../hooks/useAxios";
 import { useSnack } from "../../providers/SnackbarProvider";
-import { useUser } from "../../users/providers/UserProvider";
 import useUsers from "../../users/hooks/useUsers";
 import {
   changeLikeStatus,
@@ -24,7 +23,6 @@ export default function useCards() {
   const [cards, setCards] = useState([]);
   useAxios();
   const snack = useSnack();
-  const { user } = useUser();
 
   const navigate = useNavigate();
 
@@ -42,23 +40,20 @@ export default function useCards() {
   const handleGetCards = useCallback(async () => {
     try {
       setLoading(true);
-      handleCheckToken();
+      await timeout(400); //in Milliseconds     
       const cards = await getCards();
-      await timeout(400); //in Milliseconds
       requestStatus(false, null, cards);
-      snack("success", "All the cards are here!");
     } catch (error) {
       requestStatus(false, error, null);
-      snack("error", "Failed to fetch cards");
     }
   });
 
   const handleGetMyCards = useCallback(async () => {
     try {
-        setLoading(true);
-        handleCheckToken();
-        const cards = await getMyCards();
-        requestStatus(false, null, cards);
+      setLoading(true);
+      handleCheckToken();
+      const cards = await getMyCards();
+      requestStatus(false, null, cards);
 
     } catch (error) {
       requestStatus(false, error, null);
@@ -69,7 +64,6 @@ export default function useCards() {
   const handleGetCard = useCallback(async (cardId) => {
     try {
       setLoading(true);
-      handleCheckToken();
       const card = await getCard(cardId);
       requestStatus(false, null, null, card);
       return card;
@@ -86,11 +80,10 @@ export default function useCards() {
       await timeout(200);
       const card = await createCard(cardFromClient);
       requestStatus(false, null, null, card);
-      snack("success", "A new business card has been created");
+      snack("success", card.message);
       navigate(-1);
     } catch (error) {
       requestStatus(false, error, null);
-      snack("error", "Failed to create card");
     }
   }, []);
 
@@ -102,11 +95,10 @@ export default function useCards() {
       await timeout(200);
       const card = await editCard(cardId, cardFromClient);
       requestStatus(false, null, null, card);
-      snack("success", "The business card has been successfully updated");
+      snack("success", card.message);
       navigate(-1);
     } catch (error) {
       requestStatus(false, error, null);
-      snack("error", "Failed to update card");
     }
   }, []);
 
@@ -115,25 +107,16 @@ export default function useCards() {
       setLoading(true);
       handleCheckToken();
       await timeout(200);
-      await deleteCard(cardId);
-      setLoading(false);
+      const card = await deleteCard(cardId);
+      requestStatus(false, null, null, card);
+      snack("success", card.message);
       if (!rootFlag) {
         navigate(-1);
       }
     } catch (error) {
-      setLoading(false);
-      setError(error);
+      requestStatus(false, error, null);
     }
   }, []);
-
-
-  const addToLikes = ((card) => {
-    snack("success", "\"" + card.title + "\" has been added to your favorites");
-  })
-
-  const removeFromLikes = ((card) => {
-    snack("success", "\"" + card.title + "\" has been removed from your favorites");
-  })
 
   //handleLikeCard
   const handleLikeCard = useCallback(async (cardId) => {
@@ -142,7 +125,7 @@ export default function useCards() {
       await timeout(200);
       const card = await changeLikeStatus(cardId);
       requestStatus(false, null, cards, card);
-      card.likes.includes(user.id) ? addToLikes(card) : removeFromLikes(card);
+      snack("success", card.message);
     } catch (error) {
       requestStatus(false, error, null);
     }
@@ -151,13 +134,14 @@ export default function useCards() {
   //handleGetFavCards
   const handleGetFavCards = useCallback(async () => {
     try {
-        setLoading(true);
-        handleCheckToken();
-        await timeout(200);
-        const cards = await getFavCards();
-        requestStatus(false, null, cards);
+      setLoading(true);
+      handleCheckToken();
+      await timeout(400);
+      const cards = await getFavCards();
+      requestStatus(false, null, cards);
     } catch (error) {
       requestStatus(false, error, null);
+      snack("error", "Failed to fetch cards");
     }
   }, []);
 

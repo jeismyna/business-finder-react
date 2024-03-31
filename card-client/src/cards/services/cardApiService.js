@@ -8,7 +8,7 @@ export const getCards = async () => {
     const data = response.data;
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -18,7 +18,7 @@ export const getFavCards = async () => {
     const data = response.data;
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -28,7 +28,7 @@ export const getMyCards = async () => {
     const data = response.data;
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -37,7 +37,7 @@ export const deleteCard = async (cardId) => {
     const { data } = await axios.delete(`${apiUrl}/cards/${cardId}`);
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -46,7 +46,7 @@ export const getCard = async (cardId) => {
     const { data } = await axios.get(`${apiUrl}/cards/${cardId}`);
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -55,7 +55,7 @@ export const createCard = async (card) => {
     const { data } = await axios.post(`${apiUrl}/cards/`, card);
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -67,7 +67,7 @@ export const editCard = async (cardId, normalaizedCard) => {
     );
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };
 
@@ -76,6 +76,6 @@ export const changeLikeStatus = async (cardId) => {
     const { data } = await axios.patch(`${apiUrl}/cards/${cardId}`);
     return data;
   } catch (error) {
-    return Promise.reject(error.message);
+    return Promise.reject(error.response ? error.response.data.message : error.message);
   }
 };

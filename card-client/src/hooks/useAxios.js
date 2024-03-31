@@ -15,7 +15,7 @@ export default function useAxios() {
     const responseInterceptor = axios.interceptors.response.use(
       null,
       (error) => {
-        if (error.message) snack("error", error.message);
+        if (error.message) snack("error", error.response ? error.response.data.message : error.message);
         return Promise.reject(error);
       }
     );
