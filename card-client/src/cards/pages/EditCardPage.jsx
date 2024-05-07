@@ -44,7 +44,7 @@ export default function EditCardPage() {
   return (
     <Container
       sx={{
-        paddingTop: 8,
+        paddingTop: 3,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

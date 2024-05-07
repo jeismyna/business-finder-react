@@ -25,7 +25,7 @@ export default function SignupPage() {
   return (
     <Container
       sx={{
-        paddingTop: 8,
+        paddingTop: 0,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -35,7 +35,7 @@ export default function SignupPage() {
         onSubmit={rest.onSubmit}
         onReset={rest.handleReset}
         onFormChange={rest.validateForm}
-        title="SignUp"
+        title="Sign up"
         errors={value.errors}
         data={value.data}
         onInputChange={rest.handleChange}

@@ -23,7 +23,6 @@ export default function CardPage() {
   };
 
   return (
-    <React.Fragment>
       <Container sx={{ mt: 0 }}>
         <PageHeader
           title="Home"
@@ -37,6 +36,5 @@ export default function CardPage() {
           handleUpdateFavsPage={handleUpdateFavsPage}
         />
       </Container>
-    </React.Fragment>
   );
 }

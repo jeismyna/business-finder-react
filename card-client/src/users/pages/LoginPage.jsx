@@ -1,6 +1,5 @@
 import { Container } from "@mui/material";
 import React from "react";
-import PageHeader from "../../components/PageHeader";
 import useForm from "../../forms/hooks/useForm";
 import initialLoginForm from "../helpers/initialForms/initialLoginForm";
 import loginSchema from "../models/joi-schema/loginSchema";
@@ -24,10 +23,6 @@ export default function LoginPage() {
   if (user) return <Navigate replace to={ROUTES.ROOT} />;
 
   return (
-    <Container>
-      <PageHeader
-        title="Login"
-      />
       <Container
         sx={{
           paddingTop: 0,
@@ -38,6 +33,7 @@ export default function LoginPage() {
       >
         <Form
           styles={{ maxWidth: "450px" }}
+          title="Log in"
           to={ROUTES.ROOT}
           onSubmit={rest.onSubmit}
           onReset={rest.handleReset}
@@ -61,6 +57,5 @@ export default function LoginPage() {
           />
         </Form>
       </Container>
-    </Container>
   );
 }
